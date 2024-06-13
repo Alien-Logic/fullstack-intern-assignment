@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import { setToken } from '@/redux/auth/auth.slice';
 import useAuthSession from '../hooks/useAuthSession';
 import { useAppDispatch } from '@/redux/store';
@@ -9,11 +10,24 @@ const HomePage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useAppDispatch();
-  const user = useAuthSession();
-
-  const handleLogin = async () => {
-    // Implement the logic to authenticate the user
+  const { authenticate, isAuthenticated, user, logoutUser } = useAuthSession();
+  
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    console.log("clicked")
+    const success = await authenticate(username, password);
+    
+    if (success) {
+      console.log("login")
+    }
+    else {
+      alert('Login failed');
+    }
   };
+
+  const handleLogout = () => {
+    logoutUser();
+  }
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -21,6 +35,12 @@ const HomePage = () => {
         {user ? (
           <div>
             <h2 className="text-xl font-bold">Welcome, {user.username}</h2>
+            <button
+              onClick={handleLogout}
+              className="w-full px-4 py-2 mt-6 font-bold text-white bg-red-500 rounded-md"
+            >
+              Logout
+            </button>
           </div>
         ) : (
           <div>
@@ -30,14 +50,14 @@ const HomePage = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Username"
-              className="w-full px-4 py-2 mt-4 border rounded-md"
+              className="w-full px-4 py-2 mt-4 border rounded-md  text-black"
             />
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full px-4 py-2 mt-4 border rounded-md"
+              className="w-full px-4 py-2 mt-4 border rounded-md text-black"
             />
             <button
               onClick={handleLogin}
